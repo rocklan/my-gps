@@ -2,10 +2,13 @@
 
 	var gpsData = [];
 	var tracking = false;
+	var showingBubble = true;
 	var rows = "";
 	var lastLoc = null;
 	var dist = 0;
 	var mymap;
+	var mapBubble;
+	var startLocation;
 
 	startup();
 
@@ -25,6 +28,8 @@
 	function setupMap() {
 		navigator.geolocation.getCurrentPosition(function (location) {
 
+			startLocation = location;
+
 			mymap = L.map('mapid').setView([location.coords.latitude, location.coords.longitude], 12);
 
 			L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
@@ -36,27 +41,53 @@
 				accessToken: 'pk.eyJ1Ijoicm9ja2xhbiIsImEiOiJja2RmamNyeTM0eWlsMnVxeWZ0cHhiNHZ6In0.VFVX9RunPHmBt8_NeJ2Ppw'
 			}).addTo(mymap);
 
-			var circle = L.circle([location.coords.latitude, location.coords.longitude], {
-				color: 'red',
-				fillColor: '#f03',
-				fillOpacity: 0.25,
-				radius: 2500
-			}).addTo(mymap);
+			var marker = L.marker([location.coords.latitude, location.coords.longitude]).addTo(mymap);
+
+			addBubble();
 		});
 
 	}
 
+	function addBubble() {
+		mapBubble = L.circle([startLocation.coords.latitude, startLocation.coords.longitude], {
+			color: 'red',
+			fillColor: '#f03',
+			fillOpacity: 0.25,
+			radius: 2500
+		}).addTo(mymap);
+
+    }
+
 	function setupEventHandlers() {
 		var startButton = document.getElementById('Start');
-		var stopButton = document.getElementById('Stop');
 		var downloadButton = document.getElementById('Download');
 		var clearButton = document.getElementById('Clear');
+		var bubbleButton = document.getElementById('Bubble');
+		
 
 		startButton.addEventListener("click", function () {
-			tracking = true;
+			if (tracking) {
+				startButton.innerHTML = "Start";
+				tracking = false;
+			} else {
+				startButton.innerHTML = "Stop";
+				tracking = true;
+            }
 		});
-		stopButton.addEventListener("click", function () {
-			tracking = false;
+
+		bubbleButton.addEventListener("click", function () {
+			if (showingBubble) {
+				bubbleButton.innerHTML = "Show 5km";
+				showingBubble = false;
+
+				mymap.removeLayer(mapBubble);
+				
+			} else {
+				bubbleButton.innerHTML = "Hide 5km";
+				showingBubble = true;
+
+				addBubble();
+			}
 		});
 		downloadButton.addEventListener("click", function () {
 			downloadData();

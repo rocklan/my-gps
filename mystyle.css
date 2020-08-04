@@ -26,7 +26,7 @@ html {
 	width: 100%;
 }
 
-#mapid { width: 100%; height: 300px; }
+#mapid { width: 100%; height: 512px; }
 
 th {
 	text-align: left;
