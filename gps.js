@@ -146,9 +146,29 @@
 				rows += row;
 
 				document.getElementById("tabledetails").innerHTML = rows;
+
+				drawRoute();
+
 			});
 
 		}
+	}
+
+	var routePolygon = null;
+
+	function drawRoute() {
+
+		var myRoute = [];
+
+		for (var i = 0; i < gpsData.length; i++) {
+			myRoute.push([gpsData[i].lat, gpsData[i].lon]);
+        }
+
+		if (routePolygon != null) {
+			mymap.removeLayer(routePolygon);
+		}
+
+		routePolygon = L.polygon(myRoute).addTo(mymap);
 	}
 
 	function degreesToRadians(degrees) {
